@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout4"
+    layout:decorate="~{layout4}">
+
+<head>
+    <title>LinguaConnect</title>
+
+</head>
+
+<body>
+    <div class="container" layout:fragment="content4">
+        <div class="d-flex flex-wrap ">
+            <h1 class="flex-grow-1">[[#{learningContent.list.headline}]]</h1>
+            <div>
+                <a th:href="@{/manager/learningContentAdd/{id}(id=${courseObj.courseId})}" class="btn btn-primary">Add
+                    Learning Content</a>
+                <a th:href="@{/manager/courses}" class="btn btn-secondary">Back to Course List</a>
+            </div>
+
+        </div>
+        <div th:if="${learningContentList.empty}">No Data found. Create a new Learning Content</div>
+        <div th:if="${!learningContentList.empty}" class="table-responsive">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-0">Course ID: <span th:text="${courseObj.courseId}"></span></h2>
+                    <p class="text-muted mb-0">Course Title: <span th:text="${courseObj.courseTitle}"></span></p>
+                </div>
+            </div>
+            <div class="container mt-4">
+                <div class="row">
+                    <div th:each="content : ${learningContentList}" class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="card-subtitle text-muted"><span th:text="${content.unit}"></span></h6>
+                            </div>
+                            <img th:if="${(content.getPostImage() != null) && (content.getPostImage().length > 0)}"
+                                th:src="@{'/manager/learningContent/image/' + ${content.contentId}}"
+                                class="card-img-top" alt="Content Image">
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${content.contentTitle}"></h5>
+                                <p class="card-text" th:text="${content.contentDescription}"></p>
+                                <a th:href="@{/manager/learningContent/edit/{learningContentId}(learningContentId=${content.contentId})}"
+                                    class="btn btn-info btn-sm">Edit</a>
+                                <a th:href="@{/manager/learningContent/delete/{learningContentId}(learningContentId=${content.contentId})}"
+                                    class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:replace="~{fragments/forms :: pagination}"></div>
+
+        </div>
+    </div>
+</body>
+
+</html>
