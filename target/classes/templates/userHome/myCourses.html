@@ -18,8 +18,8 @@
                         <p class="card-text" th:text="${course.courseDescription}"></p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item" th:text="${'Type: ' + course.courseType}"></li>
-                            <li class="list-group-item" th:text="${'Duration: ' + course.courseDuration}"></li>
-                            <li class="list-group-item" th:text="${'Price: ' + course.coursePrice}"></li>
+                            <li class="list-group-item" th:text="${'Duration: ' + course.courseDuration}"></li>                          
+                            <li class="list-group-item" th:text="${'Instructor: Prof. ' + course.tutor.username}"></li>
                             <li class="list-group-item"><a th:href="@{/user/learningContent/{courseId}(courseId=${course.courseId})}" class="btn btn-secondary btn-sm">Getting Started</a></li>
                         </ul>
                     </div>

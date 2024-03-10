@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout4"
+    layout:decorate="~{layout4}">
+
+<head>
+    <title>LinguaConnect</title>
+</head>
+
+<body>
+    <div layout:fragment="content4">
+        <style>
+            .chat-container {
+                max-width: 800px;
+                margin: auto;
+                padding: 20px;
+            }
+
+            .chat-box {
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                /* max-height: 400px; */
+                height: 400px;
+                overflow-y: scroll;
+            }
+
+            .message {
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .message:last-child {
+                border-bottom: none;
+            }
+
+            .tutors-list {
+                width: 300px;
+                padding-right: 20px;
+            }
+
+            .message-body {
+                background-color: #f5f5f5;
+                border-radius: 10px;
+                padding: 8px 12px;
+                display: inline-block;
+            }
+
+            .message-body.tutor {
+                background-color: #d4edda;
+            }
+
+            .message-body.student {
+                background-color: #cce5ff;
+            }
+
+            .message-time {
+                font-size: 12px;
+                color: #999;
+                margin-left: 10px;
+            }
+
+            .input-group-text {
+                cursor: pointer;
+            }
+        </style>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <!-- Tutors List -->
+                <div class="col-md-3 tutors-list">
+                    <h5 class="mb-4">Student List</h5>
+                    <ul class="list-group">
+                        <th:block th:each="tutor : ${tutors}">
+                            <li class="list-group-item" th:text="${tutor.username}"></li>
+                        </th:block>
+                    </ul>
+                </div>
+
+                <!-- Chat box -->
+                <div class="col-md-8">
+                    <div class="chat-container">
+                        <div class="chat-box" id="chat-box">
+                            <th:block th:each="message : ${userMessages}">
+                                <div class="message">
+                                    <span class="message-body tutor" th:text="${message.content}"></span>
+                                    <span class="message-time" th:text="${message.timestamp}"></span>
+                                    <span class="message-time" th:text="'to ' + ${message.receiver.username}"></span>
+
+                                </div>
+                            </th:block>
+                        </div>
+                        <form th:action="@{/manager/send-message}" th:object="${message}" method="post">
+                            <div class="input-group mt-3">
+                                <select class="custom-select" th:field="*{receiver}">
+                                    <option value="" disabled selected>Select Tutor</option>
+                                    <th:block th:each="tutor : ${tutors}">
+                                        <option th:value="${tutor.userId}" th:text="${tutor.username}"></option>
+                                    </th:block>
+                                </select>
+                                <input type="text" class="form-control" th:field="*{content}"
+                                    placeholder="Type your message...">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i>
+                                        Send</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

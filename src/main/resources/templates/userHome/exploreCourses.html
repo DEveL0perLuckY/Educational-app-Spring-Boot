@@ -7,54 +7,45 @@
 </head>
 
 <body>
+
     <div layout:fragment="content2">
-        <div class="container mt-5">
-            <h2>Explore Courses</h2>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <h3>Programming Courses</h3>
-                    <ul class="list-group">
-                        <li th:each="course : ${programming}" class="list-group-item">
-                            <strong th:text="${course.courseTitle}"></strong>
-                            <p th:text="${course.courseDescription}"></p>
-                            <a th:href="@{/user/detail/{courseId}(courseId=${course.courseId})}" class="btn btn-primary btn-sm">Details</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h3>Computer Science Courses</h3>
-                    <ul class="list-group">
-                        <li th:each="course : ${cs}" class="list-group-item">
-                            <strong th:text="${course.courseTitle}"></strong>
-                            <p th:text="${course.courseDescription}"></p>
-                            <a th:href="@{/user/detail/{courseId}(courseId=${course.courseId})}" class="btn btn-primary btn-sm">Details</a>
-                        </li>
-                    </ul>
-                </div>
+        <header class="py-3 mb-4 border-bottom">
+            <div class="container d-flex flex-wrap justify-content-center">
+                <a href="/"
+                    class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto link-body-emphasis text-decoration-none">
+                    <svg class="bi me-2" width="40" height="32">
+                        <use xlink:href="#bootstrap" />
+                    </svg>
+                    <span class="fs-4">
+                        <h2>Explore Courses</h2>
+                    </span>
+                </a>
+                <form class="col-12 col-lg-auto mb-3 mb-lg-0" role="search">
+                    <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+                </form>
             </div>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <h3>Web Development Courses</h3>
-                    <ul class="list-group">
-                        <li th:each="course : ${web}" class="list-group-item">
-                            <strong th:text="${course.courseTitle}"></strong>
-                            <p th:text="${course.courseDescription}"></p>
-                            <a th:href="@{/user/detail/{courseId}(courseId=${course.courseId})}" class="btn btn-primary btn-sm">Details</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h3>Other Courses</h3>
-                    <ul class="list-group">
-                        <li th:each="course : ${other}" class="list-group-item">
-                            <strong th:text="${course.courseTitle}"></strong>
-                            <p th:text="${course.courseDescription}"></p>
-                            <a th:href="@{/user/detail/{courseId}(courseId=${course.courseId})}" class="btn btn-primary btn-sm">Details</a>
-                        </li>
-                    </ul>
-                </div>
+        </header>
+        <div class="row mt-4" >
+            <div class="col-md-6" th:each="entry : ${coursesByTutor}" style="margin-bottom: 30px;">
+                <h3 th:text="'Courses by ' + ${entry.key.username}"></h3>
+                <ul class="list-group">
+                    <li th:each="course : ${entry.value}" class="list-group-item">
+                        <strong th:text="${course.courseTitle}"></strong>
+                        <p th:text="${course.courseDescription}"></p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <a th:href="@{/user/detail/{courseId}(courseId=${course.courseId})}" class="btn btn-primary btn-sm">Details</a>
+                            </div>
+                            <div class="text-muted">
+                                <span>Form :</span>
+                                <span th:text="${course.tutor.username}"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
+
     </div>
 </body>
 

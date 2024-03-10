@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.ReadOnlyProperty;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -41,5 +42,11 @@ public class User {
     @DocumentReference(lazy = true, lookup = "{ 'user' : ?#{#self._id} }")
     @ReadOnlyProperty
     private Set<UserProgress> userUserProgresses;
+
+    @DBRef
+    private Set<Message> sentMessages;
+
+    @DBRef
+    private Set<Message> receivedMessages;
 
 }

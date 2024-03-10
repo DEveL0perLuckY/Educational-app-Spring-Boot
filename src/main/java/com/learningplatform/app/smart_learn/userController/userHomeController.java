@@ -3,13 +3,17 @@ package com.learningplatform.app.smart_learn.userController;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.ui.Model;
@@ -22,10 +26,13 @@ import org.springframework.http.ResponseEntity;
 
 import com.learningplatform.app.smart_learn.domain.Course;
 import com.learningplatform.app.smart_learn.domain.LearningContent;
+import com.learningplatform.app.smart_learn.domain.Message;
 import com.learningplatform.app.smart_learn.domain.User;
 import com.learningplatform.app.smart_learn.domain.UserProgress;
+import com.learningplatform.app.smart_learn.model.MessageDto;
 import com.learningplatform.app.smart_learn.repos.CourseRepository;
 import com.learningplatform.app.smart_learn.repos.LearningContentRepository;
+import com.learningplatform.app.smart_learn.repos.MessageRepo;
 import com.learningplatform.app.smart_learn.repos.UserProgressRepository;
 import com.learningplatform.app.smart_learn.repos.UserRepository;
 import com.learningplatform.app.smart_learn.util.WebUtils;
@@ -56,26 +63,10 @@ public class userHomeController {
     public String exploreCoursesle(Model model) {
         List<Course> allCourses = courseRepository.findAll();
 
-        List<Course> programmingCourses = allCourses.stream()
-                .filter(course -> "Programming Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
+        Map<User, List<Course>> coursesByTutor = allCourses.stream()
+                .collect(Collectors.groupingBy(Course::getTutor));
 
-        List<Course> csCourses = allCourses.stream()
-                .filter(course -> "Computer Science Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
-
-        List<Course> webDevelopmentCourses = allCourses.stream()
-                .filter(course -> "Web Development Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
-
-        List<Course> otherCourses = allCourses.stream()
-                .filter(course -> "Other Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
-
-        model.addAttribute("programming", programmingCourses);
-        model.addAttribute("cs", csCourses);
-        model.addAttribute("web", webDevelopmentCourses);
-        model.addAttribute("other", otherCourses);
+        model.addAttribute("coursesByTutor", coursesByTutor);
 
         return "userHome/exploreCourses";
     }
@@ -216,4 +207,41 @@ public class userHomeController {
                 .body(post.getPostImage());
     }
 
+    @GetMapping("/videoCall")
+    public String VideoCall(Model model) {
+        return "userHome/videoCall";
+    }
+
+    @Autowired
+    MessageRepo messageRepo;
+
+    @GetMapping("/chat")
+    public String getUserChatPage(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByEmail(username).orElse(null);
+        List<User> tutors = user.getUserUserProgresses().stream().map((obj) -> obj.getCourse().getTutor())
+                .collect(Collectors.toList());
+
+        List<Message> userMessages = messageRepo.findAll();
+        MessageDto messageDto = new MessageDto();
+        model.addAttribute("userMessages", userMessages);
+        model.addAttribute("tutors", tutors);
+        model.addAttribute("message", messageDto);
+        return "userHome/userChat";
+    }
+
+    @PostMapping("/send-message")
+    public String sendMessage(@ModelAttribute("message") MessageDto messageDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByEmail(username).orElse(null);
+        Message message = new Message();
+        message.setContent(messageDto.getContent());
+        message.setTimestamp(LocalDateTime.now());
+        message.setSender(user);
+        message.setReceiver(userRepository.findById(messageDto.getReceiver()).get());
+        messageRepo.save(message);
+        return "redirect:/user/chat";
+    }
 }

@@ -39,4 +39,7 @@ public class Course {
     @DBRef
     User tutor;
 
+    public User getTutor() {
+        return tutor;
+    }
 }

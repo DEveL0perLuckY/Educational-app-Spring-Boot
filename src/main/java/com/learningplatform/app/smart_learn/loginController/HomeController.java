@@ -1,6 +1,9 @@
 package com.learningplatform.app.smart_learn.loginController;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.learningplatform.app.smart_learn.domain.Course;
+import com.learningplatform.app.smart_learn.domain.User;
 import com.learningplatform.app.smart_learn.repos.CourseRepository;
+import com.learningplatform.app.smart_learn.repos.UserRepository;
+
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/")
@@ -38,27 +45,33 @@ public class HomeController {
     public String getCoCoursesntact(Model model) {
         List<Course> allCourses = courseRepository.findAll();
 
-        List<Course> programmingCourses = allCourses.stream()
-                .filter(course -> "Programming Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
+        Map<User, List<Course>> coursesByTutor = allCourses.stream()
+                .collect(Collectors.groupingBy(Course::getTutor));
 
-        List<Course> csCourses = allCourses.stream()
-                .filter(course -> "Computer Science Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
+        model.addAttribute("coursesByTutor", coursesByTutor);
 
-        List<Course> webDevelopmentCourses = allCourses.stream()
-                .filter(course -> "Web Development Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
-
-        List<Course> otherCourses = allCourses.stream()
-                .filter(course -> "Other Courses".equals(course.getCourseType()))
-                .collect(Collectors.toList());
-
-        model.addAttribute("programming", programmingCourses);
-        model.addAttribute("cs", csCourses);
-        model.addAttribute("web", webDevelopmentCourses);
-        model.addAttribute("other", otherCourses);
         return "home/Courses";
+    }
+
+    @Autowired
+    UserRepository userRepository;
+
+    @GetMapping("/search")
+    public String getMethodName(@RequestParam String searchTerm, Model model) {
+        Optional<User> user = userRepository.findByUsername(searchTerm);
+        if (user.isPresent()) {
+            List<Course> all = courseRepository.findByTutor(user.get());
+            Map<User, List<Course>> coursesByTutor = all.stream()
+                    .collect(Collectors.groupingBy(Course::getTutor));
+            model.addAttribute("coursesByTutor", coursesByTutor);
+
+            return "home/Courses";
+        } else {
+            model.addAttribute("coursesByTutor", Collections.emptyMap());
+
+            return "home/Courses";
+
+        }
     }
 
 }

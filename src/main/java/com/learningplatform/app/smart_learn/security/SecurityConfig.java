@@ -66,7 +66,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/", "/about", "/contact", "/courses", "/images/logo.png",
                 "/images/login.jpg", "/images/signup.jpg",
-                "/unAuthorized");
+                "/unAuthorized", "/search/**");
     }
 
 }

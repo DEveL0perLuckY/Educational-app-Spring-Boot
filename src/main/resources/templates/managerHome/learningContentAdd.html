@@ -11,10 +11,10 @@
     <div class="container" layout:fragment="content4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="mb-0">Course ID: <span th:text="${courseObj.courseId}"></span></h2>
-                <p class="text-muted mb-0">Course Title: <span th:text="${courseObj.courseTitle}"></span></p>
+                <h2 class="mb-0">Language ID: <span th:text="${courseObj.courseId}"></span></h2>
+                <p class="text-muted mb-0">Language Title: <span th:text="${courseObj.courseTitle}"></span></p>
             </div>
-            <a th:href="@{/manager/courses}" class="btn btn-secondary">Back to Course List</a>
+            <a th:href="@{/manager/courses}" class="btn btn-secondary">Back to Languages List</a>
         </div>
 
         <div style="margin-bottom: 10px;">
@@ -22,7 +22,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title">Add Learning Content</h5>
+                            <h5 class="card-title">Add Flash Cards Content</h5>
                         </div>
                         <div class="card-body">
                             <form th:action="@{/manager/learningContent}" role="form" th:object="${obj}" method="post"

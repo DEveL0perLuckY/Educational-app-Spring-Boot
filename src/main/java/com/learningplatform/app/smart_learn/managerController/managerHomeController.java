@@ -1,6 +1,9 @@
 package com.learningplatform.app.smart_learn.managerController;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,11 +26,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.learningplatform.app.smart_learn.domain.Course;
 import com.learningplatform.app.smart_learn.domain.LearningContent;
+import com.learningplatform.app.smart_learn.domain.Message;
 import com.learningplatform.app.smart_learn.domain.User;
 import com.learningplatform.app.smart_learn.model.CourseDTO;
 import com.learningplatform.app.smart_learn.model.LearningContentDTO;
+import com.learningplatform.app.smart_learn.model.MessageDto;
 import com.learningplatform.app.smart_learn.repos.CourseRepository;
 import com.learningplatform.app.smart_learn.repos.LearningContentRepository;
+import com.learningplatform.app.smart_learn.repos.MessageRepo;
 import com.learningplatform.app.smart_learn.repos.UserRepository;
 import com.learningplatform.app.smart_learn.service.CourseService;
 import com.learningplatform.app.smart_learn.service.LearningContentService;
@@ -70,7 +76,13 @@ public class managerHomeController {
 
     @GetMapping("/courses")
     public String list(final Model model) {
-        model.addAttribute("courses", courseService.findAll());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByEmail(username).get();
+
+        List<Course> courses = courseRepository.findByTutor(user);
+
+        model.addAttribute("courses", courses);
         return "managerHome/list";
     }
 
@@ -257,4 +269,44 @@ public class managerHomeController {
         return "redirect:/manager/learningContent/" + learningContentDTO.getCourse();
     }
 
+    @GetMapping("/videoCall")
+    public String VideoCall(Model model) {
+        return "managerHome/videoCall";
+    }
+
+    @Autowired
+    MessageRepo messageRepo;
+
+    @GetMapping("/chat")
+    public String getUserChatPage(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByEmail(username).orElse(null);
+        List<User> students = courseRepository.findByTutor(user)
+                .stream()
+                .flatMap(course -> course.getCourseUserProgresses().stream())
+                .map(userProgress -> userProgress.getUser())
+                .collect(Collectors.toList());
+
+        List<Message> userMessages = messageRepo.findAll();
+        MessageDto messageDto = new MessageDto();
+        model.addAttribute("userMessages", userMessages);
+        model.addAttribute("tutors", students);
+        model.addAttribute("message", messageDto);
+        return "managerHome/tutorChat";
+    }
+
+    @PostMapping("/send-message")
+    public String sendMessage(@ModelAttribute("message") MessageDto messageDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByEmail(username).orElse(null);
+        Message message = new Message();
+        message.setContent(messageDto.getContent());
+        message.setTimestamp(LocalDateTime.now());
+        message.setSender(user);
+        message.setReceiver(userRepository.findById(messageDto.getReceiver()).get());
+        messageRepo.save(message);
+        return "redirect:/manager/chat";
+    }
 }

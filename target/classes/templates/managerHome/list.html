@@ -10,7 +10,7 @@
 <body>
     <div layout:fragment="content4">
         <div class="d-flex flex-wrap mb-4">
-            <h1 class="flex-grow-1">[[#{course.list.headline}]]</h1>
+            <h1 class="flex-grow-1">My Content : Languages</h1>
             <div>
                 <a th:href="@{/manager/courses/add}" class="btn btn-primary ms-2">[[#{course.list.createNew}]]</a>
             </div>
@@ -39,7 +39,7 @@
                         <td>
                             <div class="float-end text-nowrap">
                                 <a th:href="@{/manager/learningContent/{courseId}(courseId=${course.courseId})}"
-                                    class="btn btn-sm btn-secondary">Details</a>
+                                    class="btn btn-sm btn-secondary">Flash Cards</a>
                                 <a th:href="@{/manager/courses/edit/{courseId}(courseId=${course.courseId})}"
                                     class="btn btn-sm btn-secondary">[[#{course.list.edit}]]</a>
                             </div>
